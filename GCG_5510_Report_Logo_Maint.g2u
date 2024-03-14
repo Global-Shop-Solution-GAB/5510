@@ -1,0 +1,141 @@
+Program.Sub.ScreenSU.Start
+Gui.FormLogo..Create
+Gui.FormLogo..Caption("Logo Selection by Locatoin")
+Gui.FormLogo..Size(11460,10200)
+Gui.FormLogo..MinX(0)
+Gui.FormLogo..MinY(0)
+Gui.FormLogo..Position(0,0)
+Gui.FormLogo..BackColor(-2147483633)
+Gui.FormLogo..MousePointer(0)
+Gui.FormLogo..Event(UnLoad,FormLogo_UnLoad)
+Gui.FormLogo.cmdSave.Create(Button)
+Gui.FormLogo.cmdSave.Size(855,375)
+Gui.FormLogo.cmdSave.Position(105,9150)
+Gui.FormLogo.cmdSave.Caption("Save")
+Gui.FormLogo.cmdSave.Event(Click,cmdSave_Click)
+Gui.FormLogo.GsGridControlLogo.Create(GsGridControl)
+Gui.FormLogo.GsGridControlLogo.Size(10965,8970)
+Gui.FormLogo.GsGridControlLogo.Position(120,105)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	
+	F.Intrinsic.Control.CallSub(Set_Anchors)
+	F.Intrinsic.Control.CallSub(Get_Data)
+	
+	Gui.FormLogo..Show
+	
+	F.Intrinsic.Control.ExitSub
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5510_Report_Logo_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormLogo_UnLoad)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.FormLogo_UnLoad.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	
+	F.Intrinsic.Control.End
+	
+	F.Intrinsic.Control.ExitSub
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5510_Report_Logo_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormLogo_UnLoad)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.FormLogo_UnLoad.End
+
+Program.Sub.cmdSave_Click.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	
+	F.ODBC.Connection!Con.OpenCompanyConnection
+	
+	F.Data.DataTable.SaveToDB("Logo","con","GCG_5510_Report_Logo","Location",7,"Location@!@Location*!*Logo@!@Logo*!*Logo2@!@Logo2")
+	
+	F.ODBC.Connection!Con.Close
+	
+	F.Intrinsic.Control.ExitSub
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5510_Report_Logo_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormLogo_UnLoad)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdSave_Click.End
+
+Program.Sub.Get_Data.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	V.Local.sSql.Declare(String,"")
+	
+	F.ODBC.Connection!Con.OpencompanyConnection
+	
+	F.Intrinsic.String.Build("Select a.Location, Logo, Logo2 From V_Locations a Left Join GCG_5510_Report_Logo b on a.Location = b.Location Where Flag_Closed <> 'Y' Order by a.Location","",V.Local.sSql)
+	F.Data.DataTable.CreateFromSQL("Logo","con",V.Local.sSql,True)
+	
+	F.ODBC.Connection!Con.Close
+	
+	Gui.FormLogo.GsGridControlLogo.AddGridviewFromDatatable("Logo","Logo")
+	Gui.FormLogo.GsGridControlLogo.SetGridviewProperty("Logo","OptionsViewColumnAutoWidth",True)
+	
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Location","readonly",True)
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Location","allowedit",False)
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Location","HeaderBackColor","Green")
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Location","HeaderForeColor","White")
+	
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Logo","readonly",False)
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Logo","allowedit",True)
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Logo","HeaderBackColor","Green")
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Logo","HeaderForeColor","White")
+	
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Logo2","readonly",False)
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Logo2","allowedit",True)
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Logo2","HeaderBackColor","Green")
+	Gui.FormLogo.GsGridControlLogo.SetColumnProperty("Logo","Logo2","HeaderForeColor","White")
+	
+	Gui.FormLogo.GsGridControlLogo.MainView("Logo")
+	
+	F.Intrinsic.Control.ExitSub
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5510_Report_Logo_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormLogo_UnLoad)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.Get_Data.End
+
+Program.Sub.Set_Anchors.Start
+F.Intrinsic.Control.Try
+	V.Local.sError.Declare(String,"")
+	
+	Gui.FormLogo.GsGridControlLogo.Anchor(15)
+	Gui.FormLogo.cmdSave.Anchor(6)
+	
+	F.Intrinsic.Control.ExitSub
+	
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.If(V.Ambient.ErrorNumber,<>,0)
+		F.Intrinsic.String.Build("Project: {0}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}","GCG_5510_Report_Logo_Maint.g2u",V.Ambient.NewLine,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Local.sError)
+		F.Intrinsic.UI.Msgbox(V.Local.sError)
+		F.Intrinsic.Control.CallSub(FormLogo_UnLoad)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndTry
+Program.Sub.Set_Anchors.End
